@@ -1,130 +1,67 @@
-# 🛡️ Cost Guard — OpenClaw Skill
+# Lemnos Cost Guard | Lemnos 成本卫士
 
-**Real-time API cost tracking, context bloat detection, and budget enforcement for OpenClaw agents.**
+Real-time API cost monitoring and budget enforcement for OpenClaw agents.
+OpenClaw 智能体实时 API 成本监控与预算执行工具。
 
-Built by [Lemnos AI](https://getlemnos.ai) — the AI operations company that deploys agents that handle admin work for $12K/year instead of an $80K hire.
+Built by [Lemnos AI](https://getlemnos.ai) — operations experts first, AI developers second.
+由 [Lemnos AI](https://getlemnos.ai) 开发——运营专家优先，AI 开发者其次。
 
----
+## Features | 功能
 
-## What It Does
+- auto_cost_report.py — Daily spend summary from session files | 每日支出摘要
+- task_cost_report.py — Per-task cost breakdown (briefing, email, research) | 按任务类型分解成本
+- task_logger.py — Logs every task with cost, API calls, token count | 记录成本、调用次数、token 数量
+- Budget enforcement — Warning at 80%, hard stop at limit | 80% 预警，达到上限硬停止
+- Zero config — Reads OpenClaw session files directly | 零配置，直接读取会话文件
 
-Cost Guard gives your OpenClaw agent a financial brain. It watches every token, flags budget overruns before they happen, catches context bloat that quietly inflates your API bill, and routes tasks to cheaper models when appropriate.
+## Quick Start | 快速开始
 
-**Without Cost Guard:** You find out you blew your budget after the bill arrives.  
-**With Cost Guard:** Your agent warns you at 80%, stops non-revenue tasks at 100%, and tells you exactly which session or task is burning money.
+Install via ClawHub:
 
-### Features
-
-- 📊 **Auto cost reporting** — reads directly from OpenClaw session JSONL files, no manual logging required
-- 🚨 **Budget alerts** — warns at 80%, hard stops at 100%
-- 🔍 **Context bloat detection** — flags sessions with high token ratios before they spiral
-- 🧭 **Model routing rules** — built-in guidance to route simple tasks to Haiku ($0.80/M) instead of Sonnet ($3/M)
-- 📋 **Per-task cost logging** — log cost by task type for granular reporting
-- 📈 **Daily/weekly/monthly rollups** — full cost breakdown by date, model, and session
-
----
-
-## Install
-
-### Via ClawHub (recommended)
-```bash
-clawhub install lemnos-cost-guard
 ```
-Find it at: **https://clawhub.com** → search "cost-guard"
+openclaw install lemnos-cost-guard
+```
 
-### Manual
-```bash
+Or clone:
+
+```
 git clone https://github.com/getlemnos32/cost-guard.git
-cp -r cost-guard/skills/lemnos-cost-guard ~/.openclaw/workspace/skills/
 ```
 
----
+Configure your budget:
 
-## Quick Start
-
-### Daily cost check (run in morning briefing)
-```bash
-python3 skills/lemnos-cost-guard/scripts/auto_cost_report.py --budget 10.00 --format brief
+```json
+{
+  "daily_budget": 10.00,
+  "warning_threshold": 0.8,
+  "currency": "USD"
+}
 ```
 
-**Example output:**
-```
-💰 COST (today 09:14 UTC): $3.42 / $10.00 (34%) ✅ OK
-   47 calls | 1,243,800 in + 18,400 out + 892,100 cached
-```
-
-### Log a task's cost
-```bash
-python3 skills/lemnos-cost-guard/scripts/task_logger.py log "email_send" "Day 3 FU batch" --cost 0.18 --calls 6
-```
-
-### Check for context bloat
-```bash
-python3 skills/lemnos-cost-guard/scripts/context_analyzer.py --workspace /root/.openclaw/workspace
-```
-
----
-
-## Scripts Reference
-
-| Script | What It Does |
-|--------|-------------|
-| `auto_cost_report.py` | Reads OpenClaw session files directly — no manual input needed. Supports `--days`, `--date`, `--budget`, `--format` |
-| `cost_report.py` | Manual cost report from logged entries |
-| `task_cost_report.py` | Cost breakdown by task type |
-| `task_logger.py` | Log per-task costs to `task-log.jsonl` |
-| `context_analyzer.py` | Scan workspace files for bloat signals |
-| `track_cost.py` | Log a single cost entry manually |
-
----
-
-## Budget Rules (Recommended Defaults)
+Run:
 
 ```
-Daily budget:    $10.00 (non-scrape days) / $15.00 (scrape days)
-Warning at:      80% of daily budget
-Hard stop at:    100% — pause all non-revenue tasks, notify user
-Context alert:   I/O ratio > 50:1 on any single call
-Single-call cap: > 500K input tokens = immediate alert
+python auto_cost_report.py
+python task_cost_report.py
 ```
 
----
+## Why Cost Guard? | 为什么需要 Cost Guard？
 
-## Model Routing
+Running an autonomous agent 24/7 without cost controls is dangerous. One bloated session can consume 9M+ tokens and blow your budget in hours. Cost Guard is battle-tested at Lemnos AI where our agent runs daily on a $10/day budget.
 
-| Task Type | Recommended Model | Cost |
-|-----------|------------------|------|
-| Format, classify, status check | Haiku | $0.80/M input |
-| Research, drafting, analysis | Sonnet | $3.00/M input |
-| Complex reasoning (rare) | Sonnet with thinking | ~$3.00/M input |
-| Opus | Never, unless explicitly requested | $15/M input |
+全天候运行自主智能体而没有成本控制非常危险。一个膨胀的会话可以消耗 900 万+ token，几小时内耗尽预算。Cost Guard 已在 Lemnos AI 生产环境中验证，我们的智能体每天以 10 美元预算运行。
 
----
+## Use Cases | 使用场景
 
-## Why We Built This
+- One-Person Companies (一人公司) — Control costs while your agent runs your business | 智能体运营业务时控制成本
+- Freelancers — Know what each AI task costs | 了解每个任务的成本
+- Agency deployments — Monitor spend across client agents | 监控客户智能体支出
+- Dev and testing — Catch runaway costs before production | 上线前捕获失控成本
 
-We run Max — an AI operations agent deployed for Lemnos AI's own business. Max runs 24/7 executing lead generation, email sequencing, campaign management, and reporting.
+## Links | 链接
 
-Early on, we had sessions run to $40–60/day with zero visibility. Cost Guard was built out of necessity. It's now standard on every Lemnos deployment.
+- Web: https://getlemnos.ai
+- Email: nick@getlemnos.ai
+- ClawHub: lemnos-cost-guard
 
-**192+ downloads on ClawHub. Zero marketing.**
-
----
-
-## About Lemnos AI
-
-We deploy AI employees for businesses that are tired of paying $60–80K/year for admin roles.
-
-- 🌐 [getlemnos.ai](https://getlemnos.ai)
-- 📧 nick@getlemnos.ai
-- 📞 917-275-7123
-
----
-
-## License
-
-MIT — use it, fork it, deploy it.
-
----
-
-*Part of the Lemnos AI CRE Admin Automation Suite — coming to ClawHub Q3 2026.*
+MIT License
